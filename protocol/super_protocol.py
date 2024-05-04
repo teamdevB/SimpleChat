@@ -1,0 +1,2 @@
+class SuperProtocol:
+    pass
