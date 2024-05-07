@@ -1,19 +1,19 @@
 import threading
 import socket as soc
 from client.models.client_model import ClientModel
+from client.views.client_view import ClientView
 
 class ClientController:
 
     def __init__(self):
-        self.socket = soc.socket(soc.AF_INET, soc.SOCK_DGRAM)
-        user_name = input("ユーザー名を入力してください: ")
-
-        # User_name Tokenを登録する処理
-        self.client_model = ClientModel(user_name, 'token')
+        self.client_model = ClientModel()
 
     def receive_messages(self):
         while True:
             data, _ = self.socket.recvfrom(4096)
+            # User_name Tokenを登録する処理
+            #self.client_model = ClientModel(user_name, 'token')
+
             # username_len = data[0]
             # username = data[1:username_len + 1].decode('utf-8')
             # message = data[username_len + 1:].decode('utf-8')
@@ -39,7 +39,13 @@ class ClientController:
     def start(self):
         print('Chatを開始します')
 
+        # ユーザー名の入力
+        self.client_model.ask_user_name()
+
         # TCRP(チャットルームを作成する、チャットルームに参加する、)
+        is_create_chat_room = self.client_model.create_chat_room_prompt()
+
+        # server側に現在作成されているルームを表示する
 
         # UDP(メッセージのやり取り)
         received_message_thread = threading.Thread(target=self.receive_messages)

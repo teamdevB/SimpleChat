@@ -1,14 +1,18 @@
 
 class Client:
 
-    def __init__(self, user_name, token):
-        self._user_name = user_name
-        self._token = token
+    def __init__(self, user_name):
+        self.__token = None
+        self.__user_name = user_name
 
     @property
     def user_name(self):
-        return self._user_name
+        return self.__user_name
 
     @property
     def token(self):
-        return self._token
+        return self.__token
+
+    @token.setter
+    def token(self, token):
+        self.__token = token
