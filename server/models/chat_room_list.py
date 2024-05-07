@@ -1,5 +1,14 @@
 from chat_room import ChatRoom
 
-
 class ChatRoomList:
-    pass
+    def __init__(self):
+        self.rooms = {}
+
+    def add_room(self, room_name, room):
+        self.rooms[room_name] = room
+
+    def get_room(self, room_name):
+        return self.rooms.get(room_name)
+
+    def remove_room(self, room_name):
+        del self.rooms[room_name] 

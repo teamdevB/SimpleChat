@@ -2,4 +2,7 @@ from user import User
 
 
 class GuestUser(User):
-    pass
+    def __init__(self, **info):
+        super().__init__(**info)
+        self.is_host = False
+
