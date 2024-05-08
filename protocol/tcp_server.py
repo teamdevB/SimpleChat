@@ -6,8 +6,7 @@ class TCPServer():
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_port = 9001
         self.server_address ='localhost'
-        self.buffer = 32
-        self.client_address = 0
+        self.buffer = 4096
 
 
     def set_header(self, header):
@@ -39,7 +38,7 @@ class TCPServer():
         else:
             # 長すぎる場合は切り捨てる
             # エラーハンドリングはどこでやる？
-            return byte_str[:num] 
+            return byte_str[:num]
     
         
     def get_room_name_size(self):
@@ -74,7 +73,7 @@ class TCPServer():
         return message.decode("utf-8")
     
     def send_message(self, message):
-        self.connection.send(message)
+        self.connection.send(message.encode())
 
     def close_connection(self):
         self.socket.close()

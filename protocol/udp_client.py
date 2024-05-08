@@ -8,6 +8,7 @@ class UDPClient:
     def send_message(self, message):
         self.socket.sendto(message.encode('utf-8'), self.server_address)
         print(f"Sent message to server: {message}")
+
     
     def recieve_message(self):    
         response, _ = self.socket.recvfrom(4048) 
