@@ -43,6 +43,8 @@ class ClientController:
 
         # ユーザー名の入力
         self.client_model.ask_user_name()
+        #ユーザーネーム検証結果
+
 
         # TCRP(チャットルームを作成する、チャットルームに参加する、)
         is_create_chat_room = self.client_model.create_chat_room_or_join_prompt()
