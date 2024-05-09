@@ -1,9 +1,11 @@
 from client.models.client import Client
 from client.views.client_view import ClientView
+from protocol.tcp_client import TCPClient
 
 class ClientModel:
     def __init__(self):
         self.client = Client()
+        self.tcp = TCPClient()
 
     def __set_user_name(self, user_name):
         self.client.user_name = user_name
@@ -11,11 +13,6 @@ class ClientModel:
     def __set_chat_room_name(self, chat_room_name):
         self.client.chat_room_name = chat_room_name
 
-    def __set_server_host(self, server_host):
-        self.client.server_host = server_host
-
-    def __set_server_port(self, server_port):
-        self.client.server_port = server_port
 
     def get_user_name(self):
         return self.client.user_name
@@ -34,19 +31,19 @@ class ClientModel:
 
     def ask_server_info(self):
         template = ClientView.get_template('ask_for_server_info_1.txt')
-        server_host = input(template.substitute())
+        server_address = input(template.substitute())
 
         template = ClientView.get_template('ask_for_server_info_2.txt')
-        server_port = input(template.substitute())
+        server_port = int(input(template.substitute()))
 
         template = ClientView.get_template('ask_for_server_info_3.txt')
         print(template.substitute({
-            'server_host': server_host,
+            'server_host': server_address,
             'server_port': server_port
         }))
 
-        self.__set_server_host(server_host)
-        self.__set_server_port(server_port)
+        self.tcp.server_address = server_address
+        self.tcp.server_port = server_port
 
     def create_chat_room_or_join_prompt(self):
         while True:

@@ -6,28 +6,7 @@ class Client:
         self._chat_room_name = None
         self._chat_room_password = None
         self._user_name = None
-        self._server_host = None
-        self._server_port = None
 
-    @property
-    def server_host(self):
-        return self._server_host
-
-    @server_host.setter
-    def server_host(self, server_host):
-        if self._server_host is None:
-            self._server_host = server_host
-        elif self._server_host == '':
-            self._server_host = 'localhost'
-
-    @property
-    def server_port(self):
-        return self._server_port
-
-    @server_port.setter
-    def server_port(self, server_port):
-        if self._server_port is None:
-            self._server_port = server_port
 
     @property
     def user_name(self):

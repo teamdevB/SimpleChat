@@ -2,6 +2,7 @@ import threading
 import socket as soc
 from client.models.client_model import ClientModel
 from client.views.client_view import ClientView
+from protocol.tcp_client import TCPClient
 
 class ClientController:
 
@@ -38,8 +39,11 @@ class ClientController:
 
     def start(self):
 
-        # serverinfoの入力
+        # server情報
         self.client_model.ask_server_info()
+
+        # 接続確認
+        self.client_model.tcp.connect()
 
         # ユーザー名の入力
         self.client_model.ask_user_name()
