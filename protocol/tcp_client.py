@@ -1,6 +1,4 @@
 import socket
-import json
-import struct
 
 class TCPClient():
     def __init__(self):
@@ -9,94 +7,100 @@ class TCPClient():
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.buffer = 4096
 
-    def connect(self):
-        self.socket.connect((self.server_address, self.server_port))
-        print("Connected to the server at {}:{}".format(self.server_address, self.server_port))
+        self.init_header()
+        self.init_body()
 
-    def send_request(self, room_name, user_name, password, operation, state):
-        room_name_bytes = room_name.encode('utf-8')
-        room_name_size = len(room_name_bytes)
-        user_name_bytes = user_name.encode('utf-8')
-        password_bytes = password.encode('utf-8')
-        
-        # ヘッダーの準備
-        header = struct.pack('!BBB', room_name_size, operation, state)
-        # ペイロードの準備
-        # データを固定長でエンコード（余った部分は空白や特定の文字で埋める）
-        room_name_padded = room_name_bytes.ljust(20, b'\x00')  # 20バイトになるようにパディング
-        user_name_padded = user_name_bytes.ljust(15, b'\x00')  # 15バイトになるようにパディング
-        password_padded = password_bytes.ljust(12, b'\x00')   # 12バイトになるようにパディング
+    def init_header(self):
+        # ヘッダー情報をbytesで初期化
+        self.room_name_size = (0).to_bytes(1, 'big')
+        self.operation = (0).to_bytes(1, 'big')
+        self.state = (0).to_bytes(1, 'big')
 
-        # ペイロードの作成
-        payload = room_name_padded + user_name_padded + password_padded
+    def init_body(self):
+        # ボディ情報をbytesで初期化
+        self.room_name = b'\x00' * 8
+        self.user_name = b'\x00' * 5
+        self.password = b'\x00' * 8
+        self.token = b'\x00' * 8
 
-        payload_size = len(payload)
-        
-        # メッセージの全体を送信
-        self.socket.sendall(header + payload)
-        print("Request sent to server.")
+    def send_request(self, received_dict):
+        try:
+            self.dict_to_bytes(received_dict)
+            self.set_head_and_body()
+            self.socket.sendall(self.header + self.body)
+        except socket.error as e:
+            print(f"Error sending data: {e}")
+            self.close_connection()  # エラー発生時に接続を閉じる
+            return False
+        return True
 
-    def send_message(self, message_dict):
-        # JSON形式でメッセージをエンコードして送信
-        message_json = json.dumps(message_dict).encode('utf-8')
-        self.socket.sendall(message_json)
-        print("Message sent to server.")
-    
     def receive_message(self):
-        # サーバからの応答をJSON形式で受信してデコード
-        response = self.socket.recv(self.buffer)
-        return json.loads(response.decode('utf-8'))
+        try:
+            response_bytes = self.socket.recv(self.buffer)
+            if len(response_bytes) != 32:  # header+bodyは32bytes
+                print("Received incomplete data.")
+                return None
+            return self.header_and_body_to_dict(response_bytes)
+        except socket.error as e:
+            print(f"Error receiving data: {e}")
+            self.close_connection()
+            return None
+
+
+
+    def connect(self):
+        try:
+            self.socket.connect((self.server_address, self.server_port))
+            print("Connected to the server at {}:{}".format(self.server_address, self.server_port))
+        except socket.error as e:
+            print(f"Error connecting to server: {e}")
+            return False  # 返り値で接続の成否を示す
+        return True
+
+    def set_head_and_body(self):
+        self.header = self.room_name_size + self.operation + self.state
+        self.body = self.room_name + self.user_name + self.password + self.token
+
+        
+
+    def header_and_body_to_dict(self, response_bytes):
+        # 各フィールドの固定バイト位置を前提として解析
+        self.room_name_size = response_bytes[0]
+        self.operation = response_bytes[1]
+        self.state = response_bytes[2]
+        self.room_name = response_bytes[3:11]
+        self.user_name = response_bytes[11:16]
+        self.password = response_bytes[16:24]
+        self.token = response_bytes[24:32]
+
+        # ディクショナリに変換
+        response_dict = {
+            'room_name': self.room_name.decode('utf-8').rstrip('\x00'),
+            'operation': int.from_bytes(self.operation, 'big'),
+            'state': int.from_bytes(self.state, 'big'),
+            'username': self.user_name.decode('utf-8').rstrip('\x00'),
+            'password': self.password.decode('utf-8').rstrip('\x00'),
+            'token': self.token.decode('utf-8').rstrip('\x00')
+        }
+        return response_dict
+
+
+
+    def dict_to_bytes(self, dict):
+        self.room_name = dict['room_name'].encode('utf-8').ljust(8, b'\x00')
+        self.operation = dict['operation'].to_bytes(1, 'big')
+        self.state = dict['state'].to_bytes(1, 'big')
+        self.user_name = dict['username'].encode('utf-8').ljust(5, b'\x00')
+        self.password = dict['password'].encode('utf-8').ljust(8, b'\x00')
+        self.token = dict['token'].encode('utf-8').ljust(8, b'\x00')
+
     
     def close_connection(self):
-        self.socket.close()
-        print("Connection closed.")
-
-
-
-
-
-
-
-
-
-    
-    def send_header(self, room_name_size, operation, state, room_name, user_name, password):
-        room_name_encode = self.ljust_replace_space(room_name, 8)
-        user_name_encode = self.ljust_replace_space(user_name, 10)
-        password_encode = self.ljust_replace_space(password, 11)
-        
-        header = room_name_size.to_bytes(1, 'big') + \
-            operation.to_bytes(1, 'big') + \
-            state.to_bytes(1, 'big') + \
-            room_name_encode + \
-            user_name_encode + \
-            password_encode
-
-        self.socket.send(header)
-        print("Header sent to server.")
-    
-    @staticmethod
-    def ljust_replace_space(original_str: str, num: int) -> bytes:
-        byte_str = original_str.encode('utf-8')
-        if len(byte_str) < num:
-            return byte_str.ljust(num, b' ')
-        else:
-            return byte_str[:num]
-    
-    def receive_message(self):
-        message = self.socket.recv(self.buffer)
-        return message.decode('utf-8')
-
-
-# 使用例
-if __name__ == "__main__":
-    client = TCPClient()
-    client.connect()
-    client.send_request("Room1", "user123", "pass123", 1, 0)
-    response = client.receive_response()
-    print("Received from server:", response)
-    client.close_connection()
-
-
-# dictで受け取ったら、bytesに変換して送信
-# bytesを変換してdiceで送信
+        if self.socket:
+            try:
+                self.socket.close()
+                print("Connection closed.")
+            except socket.error as e:
+                print(f"Error closing socket: {e}")
+            finally:
+                self.socket = None
