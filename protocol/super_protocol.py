@@ -6,11 +6,8 @@ class BaseSocket:
         self.server_port = 9001
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.buffer = 4096
-
-        self.connect()
         self.init_data()
 
-    @staticmethod
     def init_data(self):
         # ヘッダー情報をbytesで初期化
         self.room_name_size = (0).to_bytes(1, 'big')
@@ -45,16 +42,6 @@ class BaseSocket:
             self.close_connection()
             return None
 
-
-
-    def connect(self):
-        try:
-            self.socket.connect((self.server_address, self.server_port))
-            print("Connected to the server at {}:{}".format(self.server_address, self.server_port))
-        except socket.error as e:
-            print(f"Error connecting to server: {e}")
-            return False  # 返り値で接続の成否を示す
-        return True
     
     def close_connection(self):
         if self.socket:
@@ -66,13 +53,11 @@ class BaseSocket:
             finally:
                 self.socket = None
 
-    @staticmethod
     def set_head_and_body(self):
         self.header = self.room_name_size + self.operation + self.state
         self.body = self.room_name + self.user_name + self.password + self.token
 
-        
-    @staticmethod
+
     def header_and_body_to_dict(self, response_bytes):
         # 各フィールドの固定バイト位置を前提として解析
         self.room_name_size = response_bytes[0]
@@ -95,7 +80,6 @@ class BaseSocket:
         return response_dict
 
 
-    @staticmethod
     def dict_to_bytes(self, dict):
         self.room_name = dict['room_name'].encode('utf-8').ljust(8, b'\x00')
         self.operation = dict['operation'].to_bytes(1, 'big')
