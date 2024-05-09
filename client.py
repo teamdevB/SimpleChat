@@ -1,10 +1,5 @@
 from client.controller.client_controller import ClientController
 
-SERVER_HOST = 'localhost'
-SERVER_PORT = 65432
-BUFFER_SIZE = 4096
-
-
 def main():
     try:
         client = ClientController()

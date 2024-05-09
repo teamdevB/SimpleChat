@@ -3,11 +3,19 @@ from client.views.client_view import ClientView
 
 class ClientModel:
     def __init__(self):
-        self.client = None
+        self.client = Client()
 
     def __set_user_name(self, user_name):
-        if self.client is None:
-            self.client = Client(user_name)
+        self.client.user_name = user_name
+
+    def __set_chat_room_name(self, chat_room_name):
+        self.client.chat_room_name = chat_room_name
+
+    def __set_server_host(self, server_host):
+        self.client.server_host = server_host
+
+    def __set_server_port(self, server_port):
+        self.client.server_port = server_port
 
     def get_user_name(self):
         return self.client.user_name
@@ -24,7 +32,23 @@ class ClientModel:
         user_name = input(template.substitute())
         self.__set_user_name(user_name)
 
-    def create_chat_room_prompt(self):
+    def ask_server_info(self):
+        template = ClientView.get_template('ask_for_server_info_1.txt')
+        server_host = input(template.substitute())
+
+        template = ClientView.get_template('ask_for_server_info_2.txt')
+        server_port = input(template.substitute())
+
+        template = ClientView.get_template('ask_for_server_info_3.txt')
+        print(template.substitute({
+            'server_host': server_host,
+            'server_port': server_port
+        }))
+
+        self.__set_server_host(server_host)
+        self.__set_server_port(server_port)
+
+    def create_chat_room_or_join_prompt(self):
         while True:
             template = ClientView.get_template('ask_for_operation.txt')
             operation = int(input(template.substitute({
@@ -36,3 +60,26 @@ class ClientModel:
                 return False
             else:
                 self.__continue()
+
+    def create_chat_room(self):
+        while True:
+            # chat_room_name
+            template = ClientView.get_template('ask_for_create_chat_room_1.txt')
+            chat_room_name = input(template.substitute())
+
+            # chat_room_password
+            template = ClientView.get_template('ask_for_create_chat_room_2.txt')
+            chat_room_password = input(template.substitute({
+                'chat_room_name': chat_room_name
+            }))
+
+            # check
+            template = ClientView.get_template('ask_for_create_chat_room_3.txt')
+            is_y = input(template.substitute({
+                'chat_room_name': chat_room_name,
+                'chat_room_password': chat_room_password
+            }))
+
+            if is_y == 'y':
+                break
+            self.__continue()

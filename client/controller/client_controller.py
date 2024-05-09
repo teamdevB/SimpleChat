@@ -37,13 +37,26 @@ class ClientController:
 
 
     def start(self):
-        print('Chatを開始します')
+
+        # serverinfoの入力
+        self.client_model.ask_server_info()
 
         # ユーザー名の入力
         self.client_model.ask_user_name()
 
         # TCRP(チャットルームを作成する、チャットルームに参加する、)
-        is_create_chat_room = self.client_model.create_chat_room_prompt()
+        is_create_chat_room = self.client_model.create_chat_room_or_join_prompt()
+
+
+        if is_create_chat_room is True:
+            # chatroomを作成
+            self.client_model.create_chat_room()
+        else:
+            # chatroomに参加する
+            pass
+
+        raise Exception
+        ### ここまで ##
 
         # server側に現在作成されているルームを表示する
 

@@ -1,0 +1,3 @@
+以下の内容で接続します。
+server host: $server_host
+server port: $server_port
