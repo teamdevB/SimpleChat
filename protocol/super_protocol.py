@@ -1,4 +1,5 @@
 import socket
+import json
 
 class BaseSocket:
     def __init__(self):
@@ -87,3 +88,26 @@ class BaseSocket:
         self.user_name = dict['username'].encode('utf-8').ljust(5, b'\x00')
         self.password = dict['password'].encode('utf-8').ljust(8, b'\x00')
         self.token = dict['token'].encode('utf-8').ljust(8, b'\x00')
+
+
+
+
+class BaseUDP:
+    def __init__(self, server_address='localhost', server_port=9001):
+        self.server_address = server_address
+        self.server_port = server_port
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.buffer = 4096
+
+    def send_data(self, address, data_dict):
+        data_bytes = json.dumps(data_dict).encode('utf-8')
+        self.socket.sendto(data_bytes, address)
+
+    def receive_data(self):
+        data_bytes, address = self.socket.recvfrom(self.buffer)
+        data_dict = json.loads(data_bytes.decode('utf-8'))
+        return data_dict, address
+
+    def close_socket(self):
+        self.socket.close()
+        print("Socket closed.")
