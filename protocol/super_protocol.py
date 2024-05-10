@@ -31,18 +31,6 @@ class BaseSocket:
             return False
         return True
 
-    def receive_message(self):
-        try:
-            response_bytes = self.socket.recv(self.buffer)
-            if len(response_bytes) != 32:  # header+bodyは32bytes
-                print("Received incomplete data.")
-                return None
-            return self.header_and_body_to_dict(response_bytes)
-        except socket.error as e:
-            print(f"Error receiving data: {e}")
-            self.close_connection()
-            return None
-
     
     def close_connection(self):
         if self.socket:
