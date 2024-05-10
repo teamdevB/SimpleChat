@@ -20,6 +20,7 @@ class TCPServer(BaseSocket):
     def receive_message(self):
         try:
             response_bytes = self.connection.recv(self.buffer)
+            return response_bytes
             if len(response_bytes) != 32:  # header+bodyは32bytes
                 print("Received incomplete data.")
                 return None
@@ -35,3 +36,4 @@ if __name__ == "__main__":
         print("確立しました")
         message = server.receive_message()
         print(message)
+        server.send_request(message)

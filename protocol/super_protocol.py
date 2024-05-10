@@ -23,13 +23,14 @@ class BaseSocket:
     def send_request(self, received_dict):
         try:
             self.dict_to_bytes(received_dict)
-            self.set_head_and_body()
+            print(f"Sending: {self.header + self.body}")  # 送信データのログ
             self.socket.sendall(self.header + self.body)
         except socket.error as e:
             print(f"Error sending data: {e}")
-            self.close_connection()  # エラー発生時に接続を閉じる
+            self.close_connection()
             return False
         return True
+
 
     
     def close_connection(self):
@@ -71,11 +72,13 @@ class BaseSocket:
 
     def dict_to_bytes(self, dict):
         self.room_name = dict['room_name'].encode('utf-8').ljust(8, b'\x00')
+        self.room_name_size = len(dict['room_name']).to_bytes(1, 'big')
         self.operation = dict['operation'].to_bytes(1, 'big')
         self.state = dict['state'].to_bytes(1, 'big')
         self.user_name = dict['username'].encode('utf-8').ljust(5, b'\x00')
         self.password = dict['password'].encode('utf-8').ljust(8, b'\x00')
         self.token = dict['token'].encode('utf-8').ljust(8, b'\x00')
+        self.set_head_and_body()
 
 
 

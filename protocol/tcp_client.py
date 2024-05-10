@@ -19,7 +19,10 @@ class TCPClient(BaseSocket):
     def receive_message(self):
         try:
             response_bytes = self.socket.recv(self.buffer)
-            if len(response_bytes) != 32:  # header+bodyは32bytes
+            if not response_bytes:  # データが空の場合
+                print("No data received. Connection may be closed.")
+                return None
+            if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
                 print("Received incomplete data.")
                 return None
             return self.header_and_body_to_dict(response_bytes)
@@ -27,6 +30,7 @@ class TCPClient(BaseSocket):
             print(f"Error receiving data: {e}")
             self.close_connection()
             return None
+
 
 if __name__ == "__main__":
     client = TCPClient()
@@ -39,3 +43,4 @@ if __name__ == "__main__":
         'token': "token1"
     }
     client.send_request(dic)
+    print(client.receive_message())
