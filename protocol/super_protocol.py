@@ -1,2 +1,2 @@
-class SuperProtocol:
+class SuperTCP:
     pass

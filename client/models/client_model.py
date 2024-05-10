@@ -34,7 +34,7 @@ class ClientModel:
         server_address = input(template.substitute())
 
         template = ClientView.get_template('ask_for_server_info_2.txt')
-        server_port = int(input(template.substitute()))
+        server_port = input(template.substitute())
 
         template = ClientView.get_template('ask_for_server_info_3.txt')
         print(template.substitute({
@@ -42,8 +42,11 @@ class ClientModel:
             'server_port': server_port
         }))
 
+        if server_port == '':
+            server_port = 9001
+
         self.tcp.server_address = server_address
-        self.tcp.server_port = server_port
+        self.tcp.server_port    = int(server_port)
 
     def create_chat_room_or_join_prompt(self):
         while True:

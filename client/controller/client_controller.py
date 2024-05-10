@@ -44,10 +44,23 @@ class ClientController:
 
         # 接続確認
         self.client_model.tcp.connect()
+        #self.client_model.tcp.receive_message()
 
         # ユーザー名の入力
-        self.client_model.ask_user_name()
+        #self.client_model.ask_user_name()
         #ユーザーネーム検証結果
+
+
+        send_dict = {
+            'room_name': 'sample',
+            'operation': 1,
+            'state': 0,
+            'username': 'username',
+            'password': 'password',
+            'token': 'token'
+        }
+
+        #self.client_model.tcp.send_request(send_dict)
 
 
         # TCRP(チャットルームを作成する、チャットルームに参加する、)
