@@ -1,21 +1,23 @@
-import socket
+from super_protocol import BaseUDP
 
-class UDPClient:
-    def __init__(self, server_host='localhost', server_port=9001):
-        self.server_address = (server_host, server_port)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
-    def send_message(self, message):
-        self.socket.sendto(message.encode('utf-8'), self.server_address)
-        print(f"Sent message to server: {message}")
+class UDPClient(BaseUDP):
+    def __init__(self):
+        super().__init__()
 
-    
-    def recieve_message(self):    
-        response, _ = self.socket.recvfrom(4048) 
-        response_message = response.decode('utf-8')
-        print(f"Received response from server: {response_message}")
-        return response_message
-    
-    def close(self):
-        self.socket.close()
-        print("Connection closed.")
+    def send_message(self, room_name, token, message):
+        data_dict = {
+            'room_name': room_name,
+            'token': token,
+            'message': message
+        }
+        self.send_data((self.server_address, self.server_port), data_dict)
+
+    def listen_for_responses(self):
+        while True:
+            response_dict, address = self.receive_data()
+            print(f"Response from server {address}: {response_dict}")
+
+if __name__ == "__main__":
+    client = UDPClient()
+    client.send_message('ExampleRoom', 'Token123', 'Hello UDP Server!')
+    client.listen_for_responses()
