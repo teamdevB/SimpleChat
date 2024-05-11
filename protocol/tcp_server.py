@@ -1,12 +1,4 @@
-from .super_protocol import BaseSocket
 from .cliant_handler import ClientHandler
-import socket
-
-class TCPServer(BaseSocket):
-    def __init__(self):
-        super().__init__()
-
-    
 import socket
 import threading
 

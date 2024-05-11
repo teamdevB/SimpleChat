@@ -9,7 +9,6 @@ class ClientHandler(BaseSocket):
     
 
     def handle_client(self):
-        """ クライアントとの接続を処理するスレッドのターゲット関数です。 """
         try:
             print(f"{self.client_address}からの接続を受け入れました。")
             while True:
@@ -28,7 +27,7 @@ class ClientHandler(BaseSocket):
         except socket.error as e:
             print(f"Error handling client {self.client_address}: {e}")
         finally:
-            self.connection.close()
+            self.close_connection(self.connection)
             print(f"Connection with {self.client_address} has been closed.")
 
     def send_request(self, received_dict):
@@ -37,7 +36,7 @@ class ClientHandler(BaseSocket):
         try:
             self.connection.sendall(self.header + self.body)
         except socket.error as e:
-            print(f"Error sending data to {received_dict['username']}: {e}")
+            print(f"Error sending data to {received_dict['user_name']}: {e}")
 
     def receive_message(self):
         try:

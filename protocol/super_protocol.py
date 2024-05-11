@@ -25,15 +25,12 @@ class BaseSocket:
         self.body = self.room_name + self.user_name + self.password + self.token
         
     
-    def close_connection(self):
-        if self.socket:
-            try:
-                self.socket.close()
-                print("Connection closed.")
-            except socket.error as e:
-                print(f"Error closing socket: {e}")
-            finally:
-                self.socket = None
+    def close_connection(self, socket_obj):
+        try:
+            socket_obj.close()
+            print("Connection closed.")
+        except socket.error as e:
+            print(f"Error closing socket: {e}")
 
 
     def header_and_body_to_dict(self, response_bytes):
