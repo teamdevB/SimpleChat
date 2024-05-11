@@ -5,8 +5,6 @@ class BaseSocket:
     def __init__(self):
         self.server_address = 'localhost'
         self.server_port = 9001
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.buffer = 4096
         self.init_data()
 
