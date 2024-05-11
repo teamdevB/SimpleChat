@@ -14,8 +14,7 @@ dic = {
 }
 
 client = TCPClient()
-print(client.__dict__)
 client.send_request(dic)
 receive_dic = client.receive_message()
-print(receive_dic)
+print("serverから受け取ったメッセージ: ", receive_dic)
 client.close_connection()
