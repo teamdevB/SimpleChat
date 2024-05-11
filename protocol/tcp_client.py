@@ -1,9 +1,11 @@
-from protocol.super_protocol import BaseSocket
+from .super_protocol import BaseSocket
 import socket
 
 class TCPClient(BaseSocket):
     def __init__(self):
         super().__init__()
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if self.connect():
             print(f"{self.server_address}:{self.server_port}に接続しました")
 
@@ -18,31 +20,34 @@ class TCPClient(BaseSocket):
     
     def receive_message(self):
         try:
+            response_bytes = self.socket.recv(self.buffer)
             while True:
-                response_bytes = self.socket.recv(self.buffer)
-                if response_bytes:  # データが空の場合
-                    print("data received. ")
-                    print(self.header_and_body_to_dict(response_bytes))
-                    return None
-                # if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
-                #     print("Received incomplete data.")
+                if not response_bytes:
+                    print("No data received.")
+                    return None  # 接続が閉じられたか、データが空であることを示す
+                
+                if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
+                    print("Received incomplete data.")
+                    continue  # 不完全なデータを受信した場合、次のデータを待つ
 
+                # データが適切な場合、ディクショナリに変換して返す
+                message_dict = self.header_and_body_to_dict(response_bytes)
+                return message_dict
 
         except socket.error as e:
             print(f"Error receiving data: {e}")
             self.close_connection()
             return None
 
-
-if __name__ == "__main__":
-    client = TCPClient()
-    dic = {
-        'room_name': "room_name1",
-        'operation': 0,
-        'state': 0,
-        'username': "username1",
-        'password': "password1",
-        'token': "token1"
-    }
-    client.send_request(dic)
-    print(client.receive_message())
+    def send_request(self, received_dict):
+        self.dict_to_bytes(received_dict)
+        if self.socket.fileno() == -1:
+            print("Socket is already closed.")
+            return False
+        try:
+            self.socket.sendall(self.header + self.body)
+        except socket.error as e:
+            print(f"Error sending data: {e}")
+            self.close_connection()
+            return False
+        return True

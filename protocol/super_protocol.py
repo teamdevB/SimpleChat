@@ -5,7 +5,6 @@ class BaseSocket:
     def __init__(self):
         self.server_address = 'localhost'
         self.server_port = 9001
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.buffer = 4096
         self.init_data()
 
@@ -19,19 +18,12 @@ class BaseSocket:
         self.user_name = b'\x00' * 5
         self.password = b'\x00' * 8
         self.token = b'\x00' * 8
+        self.set_head_and_body()
 
-    def send_request(self, received_dict):
-        try:
-            self.dict_to_bytes(received_dict)
-            print(f"Sending: {self.header + self.body}")  # 送信データのログ
-            self.socket.sendall(self.header + self.body)
-        except socket.error as e:
-            print(f"Error sending data: {e}")
-            self.close_connection()
-            return False
-        return True
-
-
+    def set_head_and_body(self):
+        self.header = self.room_name_size + self.operation + self.state
+        self.body = self.room_name + self.user_name + self.password + self.token
+        
     
     def close_connection(self):
         if self.socket:
@@ -43,27 +35,24 @@ class BaseSocket:
             finally:
                 self.socket = None
 
-    def set_head_and_body(self):
-        self.header = self.room_name_size + self.operation + self.state
-        self.body = self.room_name + self.user_name + self.password + self.token
-
 
     def header_and_body_to_dict(self, response_bytes):
         # 各フィールドの固定バイト位置を前提として解析
-        self.room_name_size = response_bytes[0]
-        self.operation = response_bytes[1]
-        self.state = response_bytes[2]
+        self.room_name_size = response_bytes[0:1]
+        self.operation = response_bytes[1:2]
+        self.state = response_bytes[2:3]
         self.room_name = response_bytes[3:11]
         self.user_name = response_bytes[11:16]
         self.password = response_bytes[16:24]
         self.token = response_bytes[24:32]
+        self.set_head_and_body()
 
         # ディクショナリに変換
         response_dict = {
             'room_name': self.room_name.decode('utf-8').rstrip('\x00'),
             'operation': int.from_bytes(self.operation, 'big'),
             'state': int.from_bytes(self.state, 'big'),
-            'username': self.user_name.decode('utf-8').rstrip('\x00'),
+            'user_name': self.user_name.decode('utf-8').rstrip('\x00'),
             'password': self.password.decode('utf-8').rstrip('\x00'),
             'token': self.token.decode('utf-8').rstrip('\x00')
         }
@@ -75,7 +64,7 @@ class BaseSocket:
         self.room_name_size = len(dict['room_name']).to_bytes(1, 'big')
         self.operation = dict['operation'].to_bytes(1, 'big')
         self.state = dict['state'].to_bytes(1, 'big')
-        self.user_name = dict['username'].encode('utf-8').ljust(5, b'\x00')
+        self.user_name = dict['user_name'].encode('utf-8').ljust(5, b'\x00')
         self.password = dict['password'].encode('utf-8').ljust(8, b'\x00')
         self.token = dict['token'].encode('utf-8').ljust(8, b'\x00')
         self.set_head_and_body()
