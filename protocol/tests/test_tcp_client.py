@@ -3,12 +3,13 @@ import os
 sys.path.insert(0, os.path.abspath('../../'))
 from protocol.tcp_client import TCPClient
 
-username = input("username")
+user_name = input("user_name -> :")
+room_name = input("room_name -> :")
 dic = {
-    'room_name': "roomname",
-    'operation': 7,
-    'state': 1,
-    'username': username,
+    'room_name': room_name,
+    'operation': 1,
+    'state': 2,
+    'user_name': user_name,
     'password': "password",
     'token': "token"
 }

@@ -54,7 +54,7 @@ class BaseSocket:
             'room_name': self.room_name.decode('utf-8').rstrip('\x00'),
             'operation': int.from_bytes(self.operation, 'big'),
             'state': int.from_bytes(self.state, 'big'),
-            'username': self.user_name.decode('utf-8').rstrip('\x00'),
+            'user_name': self.user_name.decode('utf-8').rstrip('\x00'),
             'password': self.password.decode('utf-8').rstrip('\x00'),
             'token': self.token.decode('utf-8').rstrip('\x00')
         }
@@ -66,7 +66,7 @@ class BaseSocket:
         self.room_name_size = len(dict['room_name']).to_bytes(1, 'big')
         self.operation = dict['operation'].to_bytes(1, 'big')
         self.state = dict['state'].to_bytes(1, 'big')
-        self.user_name = dict['username'].encode('utf-8').ljust(5, b'\x00')
+        self.user_name = dict['user_name'].encode('utf-8').ljust(5, b'\x00')
         self.password = dict['password'].encode('utf-8').ljust(8, b'\x00')
         self.token = dict['token'].encode('utf-8').ljust(8, b'\x00')
         self.set_head_and_body()

@@ -23,7 +23,6 @@ class TCPClient(BaseSocket):
                 if not response_bytes:
                     print("No data received.")
                     return None  # 接続が閉じられたか、データが空であることを示す
-                print("CLIENT RECEIVE_M: ", response_bytes)
                 
                 if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
                     print("Received incomplete data.")
@@ -31,7 +30,6 @@ class TCPClient(BaseSocket):
 
                 # データが適切な場合、ディクショナリに変換して返す
                 message_dict = self.header_and_body_to_dict(response_bytes)
-                print("Data received: ", message_dict)
                 return message_dict
 
         except socket.error as e:
@@ -41,15 +39,12 @@ class TCPClient(BaseSocket):
 
     def send_request(self, received_dict):
         self.dict_to_bytes(received_dict)
-        print(f"Sending: {self.header + self.body}")  # 送信データのログ
         if self.socket.fileno() == -1:
             print("Socket is already closed.")
             return False
-        print(f"Header: {self.header}, Body: {self.body}")
         try:
             self.socket.sendall(self.header + self.body)
         except socket.error as e:
-            print("ここでエラー")
             print(f"Error sending data: {e}")
             self.close_connection()
             return False

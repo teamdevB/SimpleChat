@@ -26,10 +26,10 @@ class TCPServer(BaseSocket):
                     print("Received incomplete data.")
                     continue
                 received_dict = self.header_and_body_to_dict(response_bytes)
-                print("クライアントから受取ったdict: ", received_dict)
+                print(f"{received_dict['user_name']}から受取ったdict: \n", received_dict)
                 received_dict["room_name"] = "ctake"
                 received_dict["operation"] = 12
-                print("クライアントヘ送ったdict :", received_dict)
+                print(f"{received_dict['user_name']}ヘ送ったdict : \n", received_dict)
                 self.send_request(received_dict, connection)
         except socket.error as e:
             print(f"Error handling client {client_address}: {e}")
