@@ -25,8 +25,7 @@ class BaseSocket:
     def set_head_and_body(self):
         self.header = self.room_name_size + self.operation + self.state
         self.body = self.room_name + self.user_name + self.password + self.token
-
-
+        
     
     def close_connection(self):
         if self.socket:

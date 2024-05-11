@@ -1,14 +1,14 @@
-import unittest
 import sys
 import os
 sys.path.insert(0, os.path.abspath('../../'))
 from protocol.tcp_client import TCPClient
 
+username = input("username")
 dic = {
     'room_name': "roomname",
     'operation': 7,
     'state': 1,
-    'username': "user",
+    'username': username,
     'password': "password",
     'token': "token"
 }
