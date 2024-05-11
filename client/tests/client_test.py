@@ -1,4 +1,4 @@
-from protocol.tcp_client import TCPClient
+from tcp_client import TCPClient
 
 
 client = TCPClient()
