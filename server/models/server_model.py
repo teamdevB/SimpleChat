@@ -1,7 +1,7 @@
 from chat_room_list import ChatRoomList
 from user import User
-from tcp_server import TCPServer
-from udp_server import UDPServer
+from protocol.tcp_server import TCPServer
+from protocol.udp_server import UDPServer
 import threading
 class ServerModel:
     def __init__(self):
