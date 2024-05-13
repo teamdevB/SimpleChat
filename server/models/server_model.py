@@ -3,7 +3,6 @@ from chat_room import ChatRoom
 from user import User
 from protocol.tcp_protocol import TCPServer
 from protocol.udp_protocol import UDPServer
-import json
 
 class ServerModel(TCPServer, UDPServer, ChatRoomList,ChatRoom):
     def __init__(self):
@@ -39,3 +38,6 @@ class ServerModel(TCPServer, UDPServer, ChatRoomList,ChatRoom):
 
     def udp_handler(self):
         room_name = response_dict["room_name"]
+        message = response_dict["message"]
+        for client in self.get_room(room_name).client_infos:
+            self.send_data(client.udp_addr, message)
