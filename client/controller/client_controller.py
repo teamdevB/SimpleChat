@@ -44,7 +44,8 @@ class ClientController:
 
         # 接続確認
         self.client_model.tcp.connect()
-        #self.client_model.tcp.receive_message()
+
+        self.client_model.tcp.receive_message()
 
         # ユーザー名の入力
         #self.client_model.ask_user_name()
@@ -60,7 +61,7 @@ class ClientController:
             'token': 'token'
         }
 
-        #self.client_model.tcp.send_request(send_dict)
+        self.client_model.tcp.send_request(send_dict)
 
 
         # TCRP(チャットルームを作成する、チャットルームに参加する、)
