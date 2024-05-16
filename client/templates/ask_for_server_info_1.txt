@@ -1,0 +1,2 @@
+ようこそ!
+接続先のserver addressを入力してください(何も指定しない場合は'localhost')
