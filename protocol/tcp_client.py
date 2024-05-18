@@ -6,8 +6,6 @@ class TCPClient(BaseSocket):
         super().__init__()
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        if self.connect():
-            print(f"{self.server_address}:{self.server_port}に接続しました")
 
     def connect(self):
         try:

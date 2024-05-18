@@ -1,11 +1,20 @@
 from client.models.client import Client
 from client.views.client_view import ClientView
 from protocol.tcp_client import TCPClient
+import configparser
+
+
+# 設定ファイル読み込み
+config = configparser.ConfigParser()
+config.read('./settings/config.ini', encoding='utf-8')
+
+BASE_DIR_TEMPLATE = config['CLIENT']['Base_Dir_Templates']
 
 class ClientModel:
     def __init__(self):
         self.client = Client()
         self.tcp = TCPClient()
+        self.view = ClientView(BASE_DIR_TEMPLATE)
 
     def __set_user_name(self, user_name):
         self.client.user_name = user_name
@@ -30,14 +39,14 @@ class ClientModel:
         self.__set_user_name(user_name)
 
     def ask_server_info(self):
-        template = ClientView.get_template('ask_for_server_info_1.txt')
-        server_address = input(template.substitute())
 
-        template = ClientView.get_template('ask_for_server_info_2.txt')
-        server_port = input(template.substitute())
+        server_address = input(self.view.template('ask_for_server_info_1.txt')
+                               .substitute())
 
-        template = ClientView.get_template('ask_for_server_info_3.txt')
-        print(template.substitute({
+        server_port = input(self.view.template('ask_for_server_info_2.txt')
+                            .substitute())
+
+        print(self.view.template('ask_for_server_info_3.txt').substitute({
             'server_host': server_address,
             'server_port': server_port
         }))
@@ -46,7 +55,7 @@ class ClientModel:
             server_port = 9001
 
         self.tcp.server_address = server_address
-        self.tcp.server_port    = int(server_port)
+        self.tcp.server_port = int(server_port)
 
     def create_chat_room_or_join_prompt(self):
         while True:

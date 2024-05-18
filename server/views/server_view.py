@@ -4,7 +4,7 @@ import termcolor
 
 
 
-class ClientView:
+class ServerView:
 
     def __init__(self, base_dir_path):
         self.base_dir_path = base_dir_path
@@ -29,7 +29,7 @@ class ClientView:
         with open(template_file, 'r', encoding='utf-8') as template_file:
             contents = template_file.read()
             contents = contents.rstrip(os.linesep)
-            contents = '{splitter}{sep}{contents}{sep}{splitter}{sep}->'.format(
-                contents=contents, splitter="=" * 60, sep=os.linesep)
+            contents = '{splitter}{sep}{contents}{sep}{splitter}{sep}'.format(
+                contents=contents, splitter="-" * 60, sep=os.linesep)
             contents = termcolor.colored(contents, color)
             return string.Template(contents)

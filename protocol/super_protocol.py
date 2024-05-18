@@ -3,8 +3,6 @@ import json
 
 class BaseSocket:
     def __init__(self):
-        self.server_address = 'localhost'
-        self.server_port = 9001
         self.buffer = 4096
         self.init_data()
 
