@@ -15,7 +15,7 @@ class ClientHandler(BaseSocket):
                 response_bytes = self.connection.recv(self.buffer)
                 if len(response_bytes) == 0:
                     break  # クライアントが接続を閉じた場合
-                if len(response_bytes) != 32:
+                if len(response_bytes) != 707:
                     print("Received incomplete data.")
                     continue
                 received_dict = self.header_and_body_to_dict(response_bytes)
