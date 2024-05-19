@@ -5,7 +5,7 @@ from protocol.tcp_server import TCPServer
 # from protocol.udp_protocol import UDPServer
 import configparser
 from server.views.server_view import ServerView
-
+import json
 
 
 # 設定ファイル読み込み
@@ -113,3 +113,25 @@ class ServerModel:
     #     message = response_dict["message"]
     #     for client in self.get_room(room_name).client_infos:
     #         self.send_data(client.udp_addr, message)
+    def run(self):
+            print("Server is running and waiting for messages...")
+            try:
+                while True:
+                    data_bytes, address = self.socket.recvfrom(4096)
+                    data_dict = json.loads(data_bytes.decode('utf-8'))
+                    room_name = data_dict["room_name"]
+                    room_client_infos = self.get_room(room_name).get_client_info_udp()
+                    room_client_infos.add_client_udp(address)
+                    print(f"Received message from {address}: {data_dict}")
+                    self.broadcast(data_dict, address,room_client_infos)
+            except KeyboardInterrupt:
+                print("Server is shutting down.")
+            finally:
+                self.socket.close()
+    def broadcast(self, message, sender_address,room_client_udps):
+        """受け取ったメッセージを登録されたクライアント全員に送信する（送信者を除く）。"""
+
+        for client_udp in room_client_udps:
+            if client_udp != sender_address:  # 送信者自身には送らない
+                data_bytes = json.dumps(message).encode('utf-8')
+                self.socket.sendto(data_bytes, client_udp)

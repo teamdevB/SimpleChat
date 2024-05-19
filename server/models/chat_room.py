@@ -5,6 +5,7 @@ class ChatRoom:
     def __init__(self, room_name):
         self.room_name = room_name
         self.user_list = UserList()
+        self.udp_address = set()
         self.room_password = None
 
     def set_room_password(self, password):
