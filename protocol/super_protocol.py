@@ -3,6 +3,8 @@ import json
 
 class BaseSocket:
     def __init__(self):
+        self.server_address = 'localhost'
+        self.server_port = 9001
         self.buffer = 4096
         self.init_data()
 
@@ -12,13 +14,13 @@ class BaseSocket:
         self.operation = (0).to_bytes(1, 'big')
         self.state = (0).to_bytes(1, 'big')
         # ボディ情報をbytesで初期化
-        self.room_name = b'\x00' * 8
-        self.user_name = b'\x00' * 5
-        self.password = b'\x00' * 8
-        self.token = b'\x00' * 8
-        self.set_head_and_body()
+        self.room_name = b'\x00' * 128
+        self.user_name = b'\x00' * 64
+        self.password = b'\x00' * 256
+        self.token = b'\x00' * 256
+        self.set_header_and_body()
 
-    def set_head_and_body(self):
+    def set_header_and_body(self):
         self.header = self.room_name_size + self.operation + self.state
         self.body = self.room_name + self.user_name + self.password + self.token
         
@@ -26,9 +28,9 @@ class BaseSocket:
     def close_connection(self, socket_obj):
         try:
             socket_obj.close()
-            print("Connection closed.")
+            print("接続が閉じられました")
         except socket.error as e:
-            print(f"Error closing socket: {e}")
+            print(f"ソケットの閉鎖エラー: {e}")
 
 
     def header_and_body_to_dict(self, response_bytes):
@@ -36,11 +38,11 @@ class BaseSocket:
         self.room_name_size = response_bytes[0:1]
         self.operation = response_bytes[1:2]
         self.state = response_bytes[2:3]
-        self.room_name = response_bytes[3:11]
-        self.user_name = response_bytes[11:16]
-        self.password = response_bytes[16:24]
-        self.token = response_bytes[24:32]
-        self.set_head_and_body()
+        self.room_name = response_bytes[3:131]
+        self.user_name = response_bytes[131:195]
+        self.password = response_bytes[195:451]
+        self.token = response_bytes[451:707]
+        self.set_header_and_body()
 
         # ディクショナリに変換
         response_dict = {
@@ -55,15 +57,14 @@ class BaseSocket:
 
 
     def dict_to_bytes(self, dict):
-        self.room_name = dict['room_name'].encode('utf-8').ljust(8, b'\x00')
+        self.room_name = dict['room_name'].encode('utf-8').ljust(128, b'\x00')
         self.room_name_size = len(dict['room_name']).to_bytes(1, 'big')
         self.operation = dict['operation'].to_bytes(1, 'big')
         self.state = dict['state'].to_bytes(1, 'big')
-        self.user_name = dict['user_name'].encode('utf-8').ljust(5, b'\x00')
-        self.password = dict['password'].encode('utf-8').ljust(8, b'\x00')
-        self.token = dict['token'].encode('utf-8').ljust(8, b'\x00')
-        self.set_head_and_body()
-
+        self.user_name = dict['user_name'].encode('utf-8').ljust(64, b'\x00')
+        self.password = dict['password'].encode('utf-8').ljust(256, b'\x00')
+        self.token = dict['token'].encode('utf-8').ljust(256, b'\x00')
+        self.set_header_and_body()
 
 
 
@@ -86,4 +87,4 @@ class BaseUDP:
 
     def close_socket(self):
         self.socket.close()
-        print("Socket closed.")
+        print("ソケットを閉じました")

@@ -26,7 +26,7 @@ class TCPClient:
                 print("No data received.")
                 return None  # 接続が閉じられたか、データが空であることを示す
                 
-            if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
+            if len(response_bytes) != 707:  # header+bodyは32bytesであることを期待
                 print("Received incomplete data.")
                 return None
 
