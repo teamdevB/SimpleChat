@@ -10,16 +10,15 @@ class ServerController:
 
     def server_tcp_create_handler(self, client_connection):
         # 部屋の作成か、部屋の参加をする用の関数
-        while True:
-            pass
+        self.server_model.tcp.receive_message(client_connection)
 
 
     def server_tcp_handler(self):
         # TCPで接続してきたクライアントを制御するための関数
         while True:
-            client_connection, client_address = self.server_model.tcp_accept()
-            client_handler = threading.Thread(target=self.server_tcp_create_handler(),
-                                              args=(client_connection,))
+            connection, address = self.server_model.tcp_accept()
+            client_handler = threading.Thread(target=self.server_tcp_create_handler,
+                                              args=(connection,))
             client_handler.start()
 
 

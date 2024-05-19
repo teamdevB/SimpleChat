@@ -34,12 +34,17 @@ class ServerModel:
             self.tcp = TCPServer(HOST, PORT, MAX_CLIENTS)
 
     def tcp_accept(self):
-        print(self.view.template('tcp_accept_1.txt').substitute())
-        client_socket, client_address = self.tcp.accept()
-        return client_socket, client_address
+        connection, address = self.tcp.accept()
 
+        print(self.view.template('tcp_accept_1.txt').substitute({
+            'address': address
+        }))
 
-    # def tcp_handler(self):
+        return connection, address
+    #
+    #
+    #
+    #def tcp_handler(self):
     #     ## 受信
     #     user_name  = response_dict["user_name"]
     #     user = User(udp_addr=None, tcp_addr=None,  response_dict["user_name"],is_host = False)

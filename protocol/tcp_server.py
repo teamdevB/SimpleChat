@@ -1,6 +1,5 @@
 import socket
-from typing import Tuple, Any
-
+from protocol.super_protocol import BaseSocket
 
 class TCPServer:
     def __init__(self, host='localhost', port=9001, max_clients=5):
@@ -10,16 +9,35 @@ class TCPServer:
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((self.server_address, self.server_port))
         self.server_socket.listen(max_clients)
+        self.base_socket = BaseSocket()
 
-    # Accept
-    def accept(self) -> tuple[socket, Any]:
+    def close(self):
+        try:
+            self.server_socket.close()
+            print("Connection closed")
+        except Exception as e:
+            print(f"Error closing socket: {e}")
+
+    def accept(self):
         try:
             connection, address = self.server_socket.accept()
             return connection, address
-        finally:
-            self.server_socket.close()
+        except Exception as e:
+            self.close()
 
-    def received(self):
+    def receive_message(self, client_connection):
         # メッセージを受け取り、Dictで返却する
         # headを解析して、サーバー側に送信する
-        pass
+        try:
+            while True:
+                response_bytes = client_connection.recv(1024)
+                # if len(response_bytes) != 32:  # header+bodyは32bytes
+                    # print("Received incomplete data.")
+                    # return None
+                if response_bytes:
+                    print(response_bytes.decode())
+                    return self.base_socket.header_and_body_to_dict(response_bytes)
+                else:
+                    break
+        except Exception as e:
+            self.close()
