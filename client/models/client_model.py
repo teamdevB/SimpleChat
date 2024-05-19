@@ -16,12 +16,16 @@ class ClientModel:
         self.tcp = TCPClient()
         self.view = ClientView(BASE_DIR_TEMPLATE)
 
-    def __set_user_name(self, user_name):
-        self.client.user_name = user_name
-
-    def __set_chat_room_name(self, chat_room_name):
-        self.client.chat_room_name = chat_room_name
-
+    def generate_request_params(self, state, token=''):
+        parameter = {
+            'user_name': self.client.user_name,
+            'room_name': self.client.chat_room_name,
+            'password': self.client.chat_room_password,
+            'operation': self.client.operation,
+            'state': state,
+            'token': token
+        }
+        return parameter
 
     def get_user_name(self):
         return self.client.user_name
@@ -34,9 +38,11 @@ class ClientModel:
         print(template.substitute())
 
     def ask_user_name(self):
-        template = ClientView.get_template('ask_for_username.txt')
-        user_name = input(template.substitute())
-        self.__set_user_name(user_name)
+
+        user_name = input(self.view.template('ask_for_username.txt')
+                               .substitute())
+
+        self.client.user_name = user_name
 
     def ask_server_info(self):
 
@@ -59,36 +65,65 @@ class ClientModel:
 
     def create_chat_room_or_join_prompt(self):
         while True:
-            template = ClientView.get_template('ask_for_operation.txt')
-            operation = int(input(template.substitute({
+            operation = int(input(self.view.template('ask_for_operation.txt').substitute({
                 'user_name': self.get_user_name()
             })))
-            if operation == 1:
-                return True
-            elif operation == 2:
-                return False
+
+            if operation == 1 or operation == 2:
+                self.client.operation = operation
+                break
             else:
                 self.__continue()
 
     def create_chat_room(self):
         while True:
             # chat_room_name
-            template = ClientView.get_template('ask_for_create_chat_room_1.txt')
-            chat_room_name = input(template.substitute())
+            chat_room_name = input(
+                self.view.template('ask_for_create_chat_room_1.txt').substitute())
 
             # chat_room_password
-            template = ClientView.get_template('ask_for_create_chat_room_2.txt')
-            chat_room_password = input(template.substitute({
-                'chat_room_name': chat_room_name
-            }))
+            chat_room_password = input(
+                self.view.template('ask_for_create_chat_room_2.txt').substitute({
+                    'chat_room_name': chat_room_name
+                }))
+
 
             # check
-            template = ClientView.get_template('ask_for_create_chat_room_3.txt')
-            is_y = input(template.substitute({
-                'chat_room_name': chat_room_name,
-                'chat_room_password': chat_room_password
-            }))
+            is_y = input(
+                self.view.template('ask_for_create_chat_room_3.txt').substitute({
+                        'chat_room_name': chat_room_name,
+                        'chat_room_password': chat_room_password
+                    }))
 
             if is_y == 'y':
+                self.client.chat_room_name = chat_room_name
+                self.client.chat_room_password = chat_room_password
+                break
+            self.__continue()
+
+    def join_chat_room(self):
+        while True:
+            print('chat room join')
+            # chat_room_name
+            chat_room_name = input(
+                self.view.template('ask_for_create_chat_room_1.txt').substitute())
+
+            # chat_room_password
+            chat_room_password = input(
+                self.view.template('ask_for_create_chat_room_2.txt').substitute({
+                    'chat_room_name': chat_room_name
+                }))
+
+
+            # check
+            is_y = input(
+                self.view.template('ask_for_create_chat_room_3.txt').substitute({
+                        'chat_room_name': chat_room_name,
+                        'chat_room_password': chat_room_password
+                    }))
+
+            if is_y == 'y':
+                self.client.chat_room_name = chat_room_name
+                self.client.chat_room_password = chat_room_password
                 break
             self.__continue()

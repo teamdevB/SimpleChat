@@ -10,7 +10,7 @@ class ServerController:
 
     def server_tcp_create_handler(self, client_connection):
         # 部屋の作成か、部屋の参加をする用の関数
-        self.server_model.tcp.receive_message(client_connection)
+        self.server_model.create_or_join_server_room_prompt(client_connection)
 
 
     def server_tcp_handler(self):
@@ -31,7 +31,7 @@ class ServerController:
     def start(self):
         # 接続のセットアップ
         self.server_model.setup()
-        print('server start')
+        print('-- server start --')
 
         #UDP
         client_udp_handler = threading.Thread(target=self.server_udp_handler,

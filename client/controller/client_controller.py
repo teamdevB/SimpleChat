@@ -45,43 +45,41 @@ class ClientController:
         # 接続確認
         self.client_model.tcp.connect()
 
-
-
-        #self.client_model.tcp.receive_message()
-
         # ユーザー名の入力
-        #self.client_model.ask_user_name()
-        #ユーザーネーム検証結果
+        self.client_model.ask_user_name()
 
 
         parameter = {
             'room_name': 'sample',
             'operation': 1,
             'state': 0,
-            'username': 'username',
+            'user_name': 'usern',
             'password': 'password',
-            'token': 'token'
+            'token': ''
         }
 
-        self.client_model.tcp.send_request(parameter)
-
-        #message = input("Enter message to send: ")
-
-        #print(self.client_model.tcp.receive_message())
+        #
+        # print(self.client_model.tcp.receive_message())
 
         # TCRP(チャットルームを作成する、チャットルームに参加する、)
-        # is_create_chat_room = self.client_model.create_chat_room_or_join_prompt()
-        #
-        #
-        # if is_create_chat_room is True:
-        #     # chatroomを作成
-        #     self.client_model.create_chat_room()
-        # else:
-        #     # chatroomに参加する
-        #     pass
+        self.client_model.create_chat_room_or_join_prompt()
+
+        if self.client_model.client.operation == 1:
+            # chatroomを作成
+            self.client_model.create_chat_room()
+        else:
+            # chatroomに参加する
+            self.client_model.join_chat_room()
+
+        parameter = self.client_model.generate_request_params(state=0)
+        self.client_model.tcp.send_request(parameter)
+        print(self.client_model.tcp.receive_message())
+        input()
 
         raise Exception
         ### ここまで ##
+
+
 
         # server側に現在作成されているルームを表示する
 

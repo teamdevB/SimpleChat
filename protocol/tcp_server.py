@@ -29,15 +29,22 @@ class TCPServer:
         # メッセージを受け取り、Dictで返却する
         # headを解析して、サーバー側に送信する
         try:
-            while True:
-                response_bytes = client_connection.recv(1024)
-                # if len(response_bytes) != 32:  # header+bodyは32bytes
-                    # print("Received incomplete data.")
-                    # return None
-                if response_bytes:
-                    print(response_bytes.decode())
-                    return self.base_socket.header_and_body_to_dict(response_bytes)
-                else:
-                    break
+            response_bytes = client_connection.recv(1024)
+            # if len(response_bytes) != 32:  # header+bodyは32bytes
+                # print("Received incomplete data.")
+                # return None
+            if response_bytes:
+               print(self.base_socket.header_and_body_to_dict(response_bytes))
+               return self.base_socket.header_and_body_to_dict(response_bytes)
+
         except Exception as e:
             self.close()
+
+    def send_request(self, client_connection, parameter: dict):
+        self.base_socket.dict_to_bytes(parameter)
+        try:
+            client_connection.sendall(self.base_socket.header + self.base_socket.body)
+        except socket.error as e:
+            print(f"Error sending data: {e}")
+            self.close_connection()
+            return False

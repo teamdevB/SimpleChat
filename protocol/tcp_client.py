@@ -21,18 +21,17 @@ class TCPClient:
     def receive_message(self):
         try:
             response_bytes = self.socket.recv(self.base_socket.buffer)
-            while True:
-                if not response_bytes:
-                    print("No data received.")
-                    return None  # 接続が閉じられたか、データが空であることを示す
-                
-                if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
-                    print("Received incomplete data.")
-                    continue  # 不完全なデータを受信した場合、次のデータを待つ
 
-                # データが適切な場合、ディクショナリに変換して返す
-                message_dict = self.base_socket.header_and_body_to_dict(response_bytes)
-                return message_dict
+            if not response_bytes:
+                print("No data received.")
+                return None  # 接続が閉じられたか、データが空であることを示す
+                
+            if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
+                print("Received incomplete data.")
+                return None
+
+            message_dict = self.base_socket.header_and_body_to_dict(response_bytes)
+            return message_dict
 
         except socket.error as e:
             print(f"Error receiving data: {e}")
@@ -41,8 +40,8 @@ class TCPClient:
 
     def send_request(self, parameter: dict):
         self.base_socket.dict_to_bytes(parameter)
-        #message = 'test1'
-        #self.socket.sendall(message.encode())
+        # message = 'test1'
+        # self.socket.sendall(message.encode())
         try:
             if self.socket.fileno() == -1:
                 print("Socket is already closed.")
