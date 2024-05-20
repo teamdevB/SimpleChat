@@ -120,18 +120,30 @@ class ServerModel:
                     data_bytes, address = self.socket.recvfrom(4096)
                     data_dict = json.loads(data_bytes.decode('utf-8'))
                     room_name = data_dict["room_name"]
-                    room_client_infos = self.get_room(room_name).get_client_info_udp()
-                    room_client_infos.add_client_udp(address)
+                    sender_token = data_dict["token"] 
+                    parts = sender_token.split(":")
+                    HOST = parts[0] 
+                    Ipaddr = parts[1]
+                    Port = parts[2]
+                    UserName = parts[3]
+                    # usernameの確認 and tokenの確認:
+                    # ipアドレスが同じ場合でポートの違いでをユーザーを判別
+                    
+                    room = self.get_room(room_name)
+                    room.add_hash_token_udp(sender_token, address)
+                    room.add_client_token(sender_token)
                     print(f"Received message from {address}: {data_dict}")
-                    self.broadcast(data_dict, address,room_client_infos)
+                    token_list = room.get_token_list()
+                    hash_map_token_udp = room.get_hash_token_udp()
+                    self.broadcast(data_dict, sender_token,token_list,hash_map_token_udp)
             except KeyboardInterrupt:
                 print("Server is shutting down.")
             finally:
                 self.socket.close()
-    def broadcast(self, message, sender_address,room_client_udps):
+    def broadcast(self, message, sender_token,token_list,hash_map_token_udp):
         """受け取ったメッセージを登録されたクライアント全員に送信する（送信者を除く）。"""
 
-        for client_udp in room_client_udps:
-            if client_udp != sender_address:  # 送信者自身には送らない
+        for client_token in token_list:
+            if client_token != sender_token:  # 送信者自身には送らない
                 data_bytes = json.dumps(message).encode('utf-8')
-                self.socket.sendto(data_bytes, client_udp)
+                self.socket.sendto(data_bytes, hash_map_token_udp[client_token])
