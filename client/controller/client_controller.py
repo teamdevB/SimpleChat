@@ -48,16 +48,6 @@ class ClientController:
         # ユーザー名の入力
         self.client_model.ask_user_name()
 
-
-        parameter = {
-            'room_name': 'sample',
-            'operation': 1,
-            'state': 0,
-            'user_name': 'usern',
-            'password': 'password',
-            'token': ''
-        }
-
         #
         # print(self.client_model.tcp.receive_message())
 
@@ -73,8 +63,11 @@ class ClientController:
 
         parameter = self.client_model.generate_request_params(state=0)
         self.client_model.tcp.send_request(parameter)
-        print(self.client_model.tcp.receive_message())
-        input()
+        message = self.client_model.tcp.receive_message()
+        print("serverからのmessage: ", message)
+        if message["state"] == 1:
+            parameter = self.client_model.generate_request_params(state=2)
+            self.client_model.tcp.send_request(parameter)
 
         raise Exception
         ### ここまで ##
