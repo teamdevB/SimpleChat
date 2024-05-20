@@ -1,6 +1,7 @@
 from client.models.client import Client
 from client.views.client_view import ClientView
 from protocol.tcp_client import TCPClient
+from protocol.udp_client import UDPClient
 import configparser
 
 
@@ -14,6 +15,7 @@ class ClientModel:
     def __init__(self):
         self.client = Client()
         self.tcp = TCPClient()
+        self.udp = UDPClient()
         self.view = ClientView(BASE_DIR_TEMPLATE)
 
     def generate_request_params(self, state, token=''):
