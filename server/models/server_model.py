@@ -127,7 +127,7 @@ class ServerModel:
         try:
             room_name = data_dict["room_name"]
             sender_token = data_dict["token"]
-            room = self.get_room(room_name)
+            room = self.chat_room_list.get_room(room_name)
             room.add_hash_token_udp(sender_token, address)
             room.add_client_token(sender_token)
             logging.info(f"Received message from {address}: {data_dict}")
