@@ -1,5 +1,4 @@
 from super_protocol import BaseUDP
-import json
 
 class UDPServer(BaseUDP):
     def __init__(self):
