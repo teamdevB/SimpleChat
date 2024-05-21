@@ -108,11 +108,6 @@ class ServerModel:
         #         print(f"{user_name}が{room_name}に参加しました")
 
 
-    # def udp_handler(self):
-    #     room_name = response_dict["room_name"]
-    #     message = response_dict["message"]
-    #     for client in self.get_room(room_name).client_infos:
-    #         self.send_data(client.udp_addr, message)
     def run(self):
             print("Server is running and waiting for messages...")
             try:
@@ -121,14 +116,6 @@ class ServerModel:
                     data_dict = json.loads(data_bytes.decode('utf-8'))
                     room_name = data_dict["room_name"]
                     sender_token = data_dict["token"] 
-                    parts = sender_token.split(":")
-                    HOST = parts[0] 
-                    Ipaddr = parts[1]
-                    Port = parts[2]
-                    UserName = parts[3]
-                    # usernameの確認 and tokenの確認:
-                    # ipアドレスが同じ場合でポートの違いでをユーザーを判別
-                    
                     room = self.get_room(room_name)
                     room.add_hash_token_udp(sender_token, address)
                     room.add_client_token(sender_token)
