@@ -62,7 +62,7 @@ class ServerModel:
             chat_room = self.chat_room_list.get_room(client_request['room_name'])
             chat_room.user_list.add_user(client_request['user_name'])
             client_request['state'] = 1
-            client_request["roomPassword"] = ""
+            client_request["password"] = ""
             client_request['token'] = client_request['user_name'] + self.generate_token()
             self.tcp.send_request(client_connection, client_request)
             client_request = self.tcp.receive_message(client_connection)
@@ -75,7 +75,7 @@ class ServerModel:
             if chat_room.is_password_checked(client_request["password"]):
                 chat_room.user_list.add_user(client_request['user_name'])
                 client_request['state'] = 1
-                client_request["roomPassword"] = ""
+                client_request["password"] = ""
                 client_request['token'] = client_request['user_name'] + self.generate_token()
                 self.tcp.send_request(client_connection, client_request)
                 client_request = self.tcp.receive_message(client_connection)
