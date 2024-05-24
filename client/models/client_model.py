@@ -18,22 +18,20 @@ class ClientModel:
         self.udp = UDPClient()
         self.view = ClientView(BASE_DIR_TEMPLATE)
 
-    def generate_request_params(self, state, token=''):
+    def generate_request_params(self, state):
         parameter = {
             'user_name': self.client.user_name,
             'room_name': self.client.chat_room_name,
             'password': self.client.chat_room_password,
             'operation': self.client.operation,
             'state': state,
-            'token': token
+            'token': self.client.token
         }
         return parameter
 
     def get_user_name(self):
         return self.client.user_name
 
-    def get_token(self):
-        return self.client.token
 
     def set_token(self, token):
         if self.client.token is None:

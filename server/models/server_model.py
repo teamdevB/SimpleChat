@@ -1,4 +1,4 @@
-from  server.models.chat_room_list import ChatRoomList
+from server.models.chat_room_list import ChatRoomList
 from protocol.tcp_server import TCPServer
 from protocol.udp_server import UDPServer
 import configparser
@@ -22,9 +22,9 @@ class ServerModel:
         self.clients = {}
         self.tokens = {}
         self.tcp = None
+        self.udp = None
         self.chat_room_list = ChatRoomList()
         self.view = ServerView(BASE_DIR_TEMPLATE)
-
 
 
     def setup(self):
@@ -87,6 +87,7 @@ class ServerModel:
         logging.info("Server is running and waiting for messages...")
         try:
             while True:
+                print('aaaa')
                 data_bytes, address = self.udp.socket.recvfrom(4096)
                 data_dict = json.loads(data_bytes.decode('utf-8'))
                 self.process_message(data_dict, address)
@@ -121,4 +122,3 @@ class ServerModel:
 
     def generate_token(self):
         return uuid.uuid4().hex
-

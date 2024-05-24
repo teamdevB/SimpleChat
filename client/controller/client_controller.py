@@ -9,8 +9,9 @@ class ClientController:
 
     def client_udp_send_handler(self):
         client = self.client_model.client
+        print(client.token)
         self.client_model.udp.send_message(
-            (client.chat_room_name, client.token))
+            client.chat_room_name, client.token)
 
     def client_udp_received_handler(self):
         self.client_model.udp.listen_for_responses()
@@ -42,8 +43,7 @@ class ClientController:
         print("serverからのmessage: ", message)
 
         # server側のトークンを登録する
-        self.set_token(message['token'])
-
+        self.client_model.client.token = message['token']
 
         if message["state"] == 1:
             parameter = self.client_model.generate_request_params(state=2)

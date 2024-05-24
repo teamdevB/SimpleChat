@@ -29,7 +29,10 @@ class Client:
 
     @property
     def token(self):
-        return self._token
+        if self._token is None:
+            return ''
+        else:
+            return self._token
 
     @token.setter
     def token(self, token):
