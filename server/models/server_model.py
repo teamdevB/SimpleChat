@@ -35,6 +35,8 @@ class ServerModel:
         # Serverの立ち上げ
         if self.tcp is None:
             self.tcp = TCPServer(HOST, PORT, MAX_CLIENTS)
+        if self.udp is None:
+            self.udp = UDPServer(HOST, PORT)
 
     def tcp_accept(self):
         connection, address = self.tcp.accept()
@@ -83,7 +85,6 @@ class ServerModel:
                 client_request = self.tcp.receive_message(client_connection)
 
     def start_udp_server(self):
-        self.udp = UDPServer(HOST, PORT)
         self.run()
     def run(self):
         logging.info("Server is running and waiting for messages...")
