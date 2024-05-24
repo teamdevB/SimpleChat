@@ -37,7 +37,7 @@ class ServerModel:
     def tcp_accept(self):
         connection, address = self.tcp.accept()
 
-        print(self.view.template('tcp_accept_1.txt').substitute({
+        logging.info(self.view.template('tcp_accept_1.txt').substitute({
             'address': address
         }))
 
@@ -51,9 +51,9 @@ class ServerModel:
             elif client_request['operation'] == 2:
                 self.join_room(client_connection, client_request)
             else:
-                print("Invalid operation request.")
+                logging.info("Invalid operation request.")
         except Exception as e:
-            print(f"Error handling client request: {e}")
+            logging.info(f"Error handling client request: {e}")
 
     def create_room(self, client_connection, client_request):
         if not self.chat_room_list.check_room_name(client_request['room_name']):
@@ -102,10 +102,8 @@ class ServerModel:
         try:
             room_name = data_dict["room_name"]
             room = self.chat_room_list.get_room(room_name)
-            print(room)
             room.add_udp(address)
-            print(f"room address list:{room.get_udp_list()}")
-            logging.info(f"Received message from {address}: {data_dict}")
+            logging.info(f"room address list:{room.get_udp_list()}")
             address_list = room.get_udp_list()
 
             self.broadcast(data_dict, address,address_list )

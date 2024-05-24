@@ -9,6 +9,7 @@ class ClientController:
 
     def client_udp_send_handler(self):
         client = self.client_model.client
+        print("チャットルームに参加しました。")
         self.client_model.udp.initial_message(
             client.chat_room_name, client.token)
         self.client_model.udp.send_message(
@@ -41,7 +42,6 @@ class ClientController:
         parameter = self.client_model.generate_request_params(state=0)
         self.client_model.tcp.send_request(parameter)
         message = self.client_model.tcp.receive_message()
-        print("serverからのmessage: ", message)
 
         # server側のトークンを登録する
         self.client_model.client.token = message['token']

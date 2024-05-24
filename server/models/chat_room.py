@@ -6,7 +6,6 @@ class ChatRoom:
     def __init__(self, room_name):
         self.room_name = room_name
         self.user_list = UserList()
-
         self.address = []
         self.room_password = None
 

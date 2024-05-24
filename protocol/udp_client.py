@@ -9,7 +9,7 @@ class UDPClient(BaseUDP):
             data_dict = {
                 "room_name": room_name,
                 "token": token,
-                "message": user_name + " has joined the chat."
+                "message": user_name + "が参加しました。"
             }
             self.send_data((self.server_address, self.server_port), data_dict)
 
@@ -26,4 +26,7 @@ class UDPClient(BaseUDP):
     def listen_for_responses(self):
         while True:
             response_dict, address = self.receive_data()
-            print(f"Response from server {address}: {response_dict}")
+            token = response_dict["token"]
+            message = response_dict["message"]
+            user_name = token.split(":")[0]
+            print(f"{user_name}: {message}")
