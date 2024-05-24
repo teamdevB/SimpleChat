@@ -23,10 +23,8 @@ class ServerController:
 
 
     def server_udp_handler(self):
-        # UDPを利用して、メッセージを送信する
-        print('udp')
-        while True:
-            pass
+        # UDPを利用して、メッセージを送信するための関数
+        self.server_model.start_udp_server()
 
     def start(self):
         # 接続のセットアップ
