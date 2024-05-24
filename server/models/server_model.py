@@ -1,13 +1,11 @@
 from  server.models.chat_room_list import ChatRoomList
-# from chat_room import ChatRoom
-# from user import User
 from protocol.tcp_server import TCPServer
-# from protocol.udp_protocol import UDPServer
+from protocol.udp_server import UDPServer
 import configparser
 from server.views.server_view import ServerView
 import json
-
-
+import logging
+import uuid
 # 設定ファイル読み込み
 config = configparser.ConfigParser()
 config.read('./settings/config.ini', encoding='utf-8')
@@ -33,6 +31,8 @@ class ServerModel:
         # Serverの立ち上げ
         if self.tcp is None:
             self.tcp = TCPServer(HOST, PORT, MAX_CLIENTS)
+        if self.udp is None:
+            self.udp = UDPServer(HOST, PORT)
 
     def tcp_accept(self):
         connection, address = self.tcp.accept()
@@ -44,41 +44,81 @@ class ServerModel:
         return connection, address
 
     def create_or_join_server_room_prompt(self, client_connection):
-        ## 受信
-        client_request = self.tcp.receive_message(client_connection)
+        try:
+            client_request = self.tcp.receive_message(client_connection)
+            if client_request['operation'] == 1:
+                self.create_room(client_connection, client_request)
+            elif client_request['operation'] == 2:
+                self.join_room(client_connection, client_request)
+            else:
+                print("Invalid operation request.")
+        except Exception as e:
+            print(f"Error handling client request: {e}")
 
-        if client_request['operation'] == 1:
-            #create room
-            if not self.chat_room_list.check_room_name(client_request['room_name']):
-                self.chat_room_list.add_room(client_request['room_name'])
+    def create_room(self, client_connection, client_request):
+        if not self.chat_room_list.check_room_name(client_request['room_name']):
+            self.chat_room_list.add_room(client_request['room_name'])
+            self.chat_room_list.set_room_password(client_request["room_name"], client_request["password"])
+            chat_room = self.chat_room_list.get_room(client_request['room_name'])
+            chat_room.user_list.add_user(client_request['user_name'])
+            client_request['state'] = 1
+            client_request["roomPassword"] = ""
+            client_request['token'] = client_request['user_name'] + self.generate_token()
+            self.tcp.send_request(client_connection, client_request)
+            client_request = self.tcp.receive_message(client_connection)
 
-                self.chat_room_list.set_room_password(
-                    client_request["room_name"]
-                    ,client_request["password"])
-
-                chat_room = self.chat_room_list.get_room(client_request['room_name'])
+    def join_room(self, client_connection, client_request):
+        ## ルームが存在するか確認
+        if self.chat_room_list.check_room_name(client_request['room_name']) :
+            chat_room = self.chat_room_list.get_room(client_request['room_name'])
+            # パスワードが一致するか確認
+            if chat_room.is_password_checked(client_request["password"]):
                 chat_room.user_list.add_user(client_request['user_name'])
-                print(chat_room.user_list.get_host_user())
-                print(chat_room.user_list.get_guest_users())
-
                 client_request['state'] = 1
+                client_request["roomPassword"] = ""
+                client_request['token'] = client_request['user_name'] + self.generate_token()
                 self.tcp.send_request(client_connection, client_request)
                 client_request = self.tcp.receive_message(client_connection)
+                
+    def start_udp_server(self):
+        self.run()
+        
+    def run(self):
+        logging.info("Server is running and waiting for messages...")
+        try:
+            while True:
+                data_bytes, address = self.udp.socket.recvfrom(4096)
+                data_dict = json.loads(data_bytes.decode('utf-8'))
+                self.process_message(data_dict, address)
+        except KeyboardInterrupt:
+            logging.info("Server is shutting down.")
+        except Exception as e:
+            logging.error(f"Unexpected error: {e}")
+        finally:
+            self.udp.socket.close()
+    def process_message(self, data_dict, address):
+        try:
+            room_name = data_dict["room_name"]
+            sender_token = data_dict["token"]
+            room = self.chat_room_list.get_room(room_name)
+            room.add_hash_token_udp(sender_token, address)
+            room.add_client_token(sender_token)
+            logging.info(f"Received message from {address}: {data_dict}")
+            token_list = room.get_token_list()
+            hash_map_token_udp = room.get_hash_token_udp()
+            self.broadcast(data_dict, sender_token, token_list, hash_map_token_udp)
+        except KeyError as e:
+            logging.error(f"KeyError: {e} - Possibly malformed message: {data_dict}")
+        except Exception as e:
+            logging.error(f"Error processing message: {e}")
+    def broadcast(self, message, sender_token,token_list,hash_map_token_udp):
+        """受け取ったメッセージを登録されたクライアント全員に送信する（送信者を除く）。"""
 
+        for client_token in token_list:
+            if client_token != sender_token:  # 送信者自身には送らない
+                data_bytes = json.dumps(message).encode('utf-8')
+                self.udp.socket.sendto(data_bytes, hash_map_token_udp[client_token])
 
-        elif client_request['operation'] == 2:
-            # join room
-            if self.chat_room_list.check_room_name(client_request['room_name']):
-                chat_room = self.chat_room_list.get_room(
-                    client_request['room_name'])
+    def generate_token(self):
+        return uuid.uuid4().hex
 
-                chat_room.user_list.add_user(client_request['user_name'])
-
-                print(chat_room.user_list.get_host_user())
-                print(chat_room.user_list.get_guest_users())
-
-                client_request['state'] = 1
-                self.tcp.send_request(client_connection, client_request)
-                client_request = self.tcp.receive_message(client_connection)
-        else:
-            pass
