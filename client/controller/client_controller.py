@@ -9,6 +9,8 @@ class ClientController:
 
     def client_udp_send_handler(self):
         client = self.client_model.client
+        self.client_model.udp.initial_message(
+            client.chat_room_name, client.token)
         self.client_model.udp.send_message(
             client.chat_room_name, client.token)
 
