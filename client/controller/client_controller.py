@@ -9,7 +9,6 @@ class ClientController:
 
     def client_udp_send_handler(self):
         client = self.client_model.client
-        print(client.token)
         self.client_model.udp.send_message(
             client.chat_room_name, client.token)
 
@@ -50,9 +49,10 @@ class ClientController:
             self.client_model.tcp.send_request(parameter)
 
         send_message_thread = threading.Thread(
-            target=self.client_udp_send_handler())
+            target=self.client_udp_send_handler)
+
         received_message_thread = threading.Thread(
-            target=self.client_udp_received_handler())
+            target=self.client_udp_received_handler)
 
         received_message_thread.start()
         send_message_thread.start()
