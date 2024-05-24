@@ -31,12 +31,12 @@ class ServerController:
         self.server_model.setup()
         print('-- server start --')
 
-        #UDP
-        client_udp_handler = threading.Thread(target=self.server_udp_handler,
-                                              args=())
-
         #TCP
         client_tcp_handler = threading.Thread(target=self.server_tcp_handler,
                                           args=())
+
+        #UDP
+        client_udp_handler = threading.Thread(target=self.server_udp_handler,
+                                              args=())
         client_udp_handler.start()
         client_tcp_handler.start()

@@ -25,9 +25,7 @@ class ServerModel:
         self.chat_room_list = ChatRoomList()
         self.view = ServerView(BASE_DIR_TEMPLATE)
 
-    # def start_server(self):
-    #     self.start()
-    #     self.run()
+
 
     def setup(self):
         # Serverの立ち上げ
@@ -81,9 +79,10 @@ class ServerModel:
                 client_request['token'] = client_request['user_name'] + self.generate_token()
                 self.tcp.send_request(client_connection, client_request)
                 client_request = self.tcp.receive_message(client_connection)
-
+                
     def start_udp_server(self):
         self.run()
+        
     def run(self):
         logging.info("Server is running and waiting for messages...")
         try:
@@ -122,3 +121,4 @@ class ServerModel:
 
     def generate_token(self):
         return uuid.uuid4().hex
+
