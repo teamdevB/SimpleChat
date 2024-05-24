@@ -22,7 +22,6 @@
     ```sh
     pip install -r requirements.txt
     ```
-Dockerを使う
 
 ## 使用方法
 1. サーバを起動します。
