@@ -1,0 +1,3 @@
+以下の内容でお間違いないでしょうか?(y/n)
+チャットルーム名: $chat_room_name
+パスワード     : $chat_room_password
