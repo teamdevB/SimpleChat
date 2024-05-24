@@ -1,6 +1,7 @@
 import os
 import string
 import termcolor
+import shutil
 
 
 
@@ -23,13 +24,25 @@ class ClientView:
 
         return _wrapper
 
+    @staticmethod
+    def clear_terminal():
+      # Windowsの場合
+        if os.name == 'nt':
+            os.system('cls')
+        # Unix系OS（Linux、Macなど）の場合
+        else:
+            os.system('clear')  
+
     @_validate_template
     def template(self, template_file, color=None):
 
         with open(template_file, 'r', encoding='utf-8') as template_file:
             contents = template_file.read()
             contents = contents.rstrip(os.linesep)
-            contents = '{splitter}{sep}{contents}{sep}{splitter}{sep}->'.format(
-                contents=contents, splitter="=" * 60, sep=os.linesep)
+            self.clear_terminal()
+            terminal_size = shutil.get_terminal_size((80, 20))  # デフォルト値を80x20に設定
+            width = terminal_size.columns
+            contents = '{contents}{sep}{splitter}{sep}->'.format(
+                contents=contents, splitter="=" * width, sep=os.linesep)
             contents = termcolor.colored(contents, color)
             return string.Template(contents)
