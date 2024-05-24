@@ -12,7 +12,7 @@
 - **プロトコル**: TCP/UDP
 - **その他**: ソケットプログラミング
 
-## インストール方法(仮)
+## インストール方法
 1. このリポジトリをクローンします。
     ```sh
     git clone git@github.com:teamdevB/SimpleChat.git
