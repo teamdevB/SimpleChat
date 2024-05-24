@@ -12,17 +12,16 @@
 - **プロトコル**: TCP/UDP
 - **その他**: ソケットプログラミング
 
-## インストール方法(仮)
+## インストール方法
 1. このリポジトリをクローンします。
     ```sh
-    git clone <リポジトリのURL>
-    cd <リポジトリのディレクトリ>
+    git clone git@github.com:teamdevB/SimpleChat.git
+    cd simpleChat
     ```
 2. 必要なライブラリをインストールします。
     ```sh
     pip install -r requirements.txt
     ```
-Dockerを使う
 
 ## 使用方法
 1. サーバを起動します。
