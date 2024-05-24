@@ -63,7 +63,7 @@ class ServerModel:
             chat_room.user_list.add_user(client_request['user_name'])
             client_request['state'] = 1
             client_request["password"] = ""
-            client_request['token'] = client_request['user_name'] +":" + self.generate_token()
+            client_request['token'] = client_request['user_name'] + ":" + self.generate_token()
             self.tcp.send_request(client_connection, client_request)
             client_request = self.tcp.receive_message(client_connection)
 
@@ -76,7 +76,7 @@ class ServerModel:
                 chat_room.user_list.add_user(client_request['user_name'])
                 client_request['state'] = 1
                 client_request["password"] = ""
-                client_request['token'] = client_request['user_name'] + ":"+ self.generate_token()
+                client_request['token'] = client_request['user_name'] + ":" + self.generate_token()
                 self.tcp.send_request(client_connection, client_request)
                 client_request = self.tcp.receive_message(client_connection)
                 
