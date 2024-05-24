@@ -33,7 +33,11 @@ class ClientModel:
         return self.client.user_name
 
     def get_token(self):
-        return self.client.__token
+        return self.client.token
+
+    def set_token(self, token):
+        if self.client.token is None:
+            self.client.token = token
 
     def __continue(self):
         template = ClientView.get_template('continue.txt')

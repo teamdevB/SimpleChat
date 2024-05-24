@@ -40,8 +40,6 @@ class TCPClient:
 
     def send_request(self, parameter: dict):
         self.base_socket.dict_to_bytes(parameter)
-        # message = 'test1'
-        # self.socket.sendall(message.encode())
         try:
             if self.socket.fileno() == -1:
                 print("Socket is already closed.")
