@@ -91,7 +91,6 @@ class ClientModel:
                     'chat_room_name': chat_room_name
                 }))
 
-
             # check
             is_y = input(
                 self.view.template('ask_for_create_chat_room_3.txt').substitute({
@@ -110,18 +109,17 @@ class ClientModel:
             print('chat room join')
             # chat_room_name
             chat_room_name = input(
-                self.view.template('ask_for_create_chat_room_1.txt').substitute())
+                self.view.template('ask_for_create_join_room_1.txt').substitute())
 
             # chat_room_password
             chat_room_password = input(
-                self.view.template('ask_for_create_chat_room_2.txt').substitute({
+                self.view.template('ask_for_create_join_room_2.txt').substitute({
                     'chat_room_name': chat_room_name
                 }))
 
-
             # check
             is_y = input(
-                self.view.template('ask_for_create_chat_room_3.txt').substitute({
+                self.view.template('ask_for_create_join_room_3.txt').substitute({
                         'chat_room_name': chat_room_name,
                         'chat_room_password': chat_room_password
                     }))
