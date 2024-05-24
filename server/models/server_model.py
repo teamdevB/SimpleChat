@@ -88,6 +88,8 @@ class ServerModel:
         try:
             while True:
                 data_bytes, address = self.udp.socket.recvfrom(4096)
+                print(data_bytes)
+                print(address)
                 data_dict = json.loads(data_bytes.decode('utf-8'))
                 self.process_message(data_dict, address)
         except KeyboardInterrupt:
@@ -99,25 +101,27 @@ class ServerModel:
     def process_message(self, data_dict, address):
         try:
             room_name = data_dict["room_name"]
-            sender_token = data_dict["token"]
             room = self.chat_room_list.get_room(room_name)
-            room.add_hash_token_udp(sender_token, address)
-            room.add_client_token(sender_token)
+            print(room)
+            room.add_udp(address)
+            print(f"room address list:{room.get_udp_list()}")
             logging.info(f"Received message from {address}: {data_dict}")
-            token_list = room.get_token_list()
-            hash_map_token_udp = room.get_hash_token_udp()
-            self.broadcast(data_dict, sender_token, token_list, hash_map_token_udp)
+            address_list = room.get_udp_list()
+
+            self.broadcast(data_dict, address,address_list )
         except KeyError as e:
             logging.error(f"KeyError: {e} - Possibly malformed message: {data_dict}")
         except Exception as e:
             logging.error(f"Error processing message: {e}")
-    def broadcast(self, message, sender_token,token_list,hash_map_token_udp):
+    def broadcast(self, message, sender_address,address_list):
         """受け取ったメッセージを登録されたクライアント全員に送信する（送信者を除く）。"""
 
-        for client_token in token_list:
-            if client_token != sender_token:  # 送信者自身には送らない
+        for client_address in address_list:
+            if client_address != sender_address:  # 送信者自身には送らない
                 data_bytes = json.dumps(message).encode('utf-8')
-                self.udp.socket.sendto(data_bytes, hash_map_token_udp[client_token])
+                print(data_bytes)
+                print(client_address)
+                self.udp.socket.sendto(data_bytes, client_address)
 
     def generate_token(self):
         return uuid.uuid4().hex
