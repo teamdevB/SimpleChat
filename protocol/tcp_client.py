@@ -26,7 +26,7 @@ class TCPClient:
                 print("No data received.")
                 return None  # 接続が閉じられたか、データが空であることを示す
                 
-            if len(response_bytes) != 32:  # header+bodyは32bytesであることを期待
+            if len(response_bytes) != 707:  # header+bodyは32bytesであることを期待
                 print("Received incomplete data.")
                 return None
 
@@ -40,8 +40,6 @@ class TCPClient:
 
     def send_request(self, parameter: dict):
         self.base_socket.dict_to_bytes(parameter)
-        # message = 'test1'
-        # self.socket.sendall(message.encode())
         try:
             if self.socket.fileno() == -1:
                 print("Socket is already closed.")

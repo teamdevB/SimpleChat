@@ -1,6 +1,7 @@
 from client.models.client import Client
 from client.views.client_view import ClientView
 from protocol.tcp_client import TCPClient
+from protocol.udp_client import UDPClient
 import configparser
 
 
@@ -14,6 +15,7 @@ class ClientModel:
     def __init__(self):
         self.client = Client()
         self.tcp = TCPClient()
+        self.udp = UDPClient()
         self.view = ClientView(BASE_DIR_TEMPLATE)
 
     def generate_request_params(self, state, token=''):
@@ -31,7 +33,11 @@ class ClientModel:
         return self.client.user_name
 
     def get_token(self):
-        return self.client.__token
+        return self.client.token
+
+    def set_token(self, token):
+        if self.client.token is None:
+            self.client.token = token
 
     def __continue(self):
         template = ClientView.get_template('continue.txt')
