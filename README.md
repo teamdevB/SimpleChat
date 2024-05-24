@@ -15,8 +15,8 @@
 ## インストール方法(仮)
 1. このリポジトリをクローンします。
     ```sh
-    git clone <リポジトリのURL>
-    cd <リポジトリのディレクトリ>
+    git clone git@github.com:teamdevB/SimpleChat.git
+    cd simpleChat
     ```
 2. 必要なライブラリをインストールします。
     ```sh
